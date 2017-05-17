@@ -1,6 +1,6 @@
 ﻿'''
 =========================
-Version1.3
+Version2.2
 =========================
 
 by MARVIN GLOTH
@@ -17,19 +17,14 @@ from matplotlib.figure import Figure
 from mpl_toolkits.mplot3d import Axes3D
 from matplotlib import animation
 from tkinter import *
-
-#startet die tk umgebung
-import sys
+import sys #startet die tk umgebung
 if sys.version_info[0] < 3:
     import Tkinter as Tk
 else:
     import tkinter as Tk
 root = Tk.Tk()
-#root.resizable(width=False,height=False)
-root.configure(background='white')
-#Grid.rowconfigure(root,1,weight=1)
-#Grid.columnconfigure(root,0,weight=1)
-root.wm_title("3D-Controll")
+#root.wm_title("3D-Controll")
+
 
 ###start datawork
 ser = serial.Serial()
@@ -49,10 +44,11 @@ def UpdatePlotWidget(i):
     plotBody.set_xlabel('X axis')
     plotBody.set_ylabel('Y axis')
     plotBody.set_zlabel('Z axis')
-    
+
+tiltSave=[0,0,0,0]    
 class Body:
     def __init__(self):
-        Body.ParamTorus(self,10,5) #bei initialisierung wird im Konstruktor der Körper Parametrisiert
+        Body.ParamTorus(self,10,2) #bei initialisierung wird im Konstruktor der Körper Parametrisiert
         #BodyPosition.ParamKegel(self,10,10)
     
     def ParamTorus(self,Ra,Ri):
@@ -67,20 +63,18 @@ class Body:
         u,v= np.mgrid[-np.pi:np.pi:5j, 0:h:5j]
         self.x = r/h * v * np.cos(u)
         self.y = r/h * v * np.sin(u)
-        self.z = v #h-v aufrechter kegel
+        self.z = v #h-v aufrechter kegel  
         
-    def readSensor(self):
+    def updatePos(self):
+        global tiltSave
         if ser.is_open:
             s =ser.readline().decode().split(',')
         else:
             s=[0,0,0,0]
+        tiltSave=s
         phi=float(s[0])*np.pi/180
         teta=float(s[1])*np.pi/180
         psi=float(s[2])*np.pi/180
-        return phi,teta,psi
-        
-    def updatePos(self):
-        phi,teta,psi=Body.readSensor(self)
         ##nummeric SinCos Calc 
         sinPhi =np.sin(phi)
         cosPhi =np.cos(phi)
@@ -102,11 +96,10 @@ class Body:
         z3 = z2
         return x3,y3,z3
 
-#erzeugt ein element body
-B1=Body()        
-##Controll Elemente     
+   
+##Controll Funnktinonen      
 def _ParamTorus():
-    Body.ParamTorus(B1,10,5)    
+    Body.ParamTorus(B1,10,2)    
 def _ParamKegel():
     Body.ParamKegel(B1,10,10)
 def _comC():
@@ -115,100 +108,120 @@ def _quit():
     root.quit()     # stop mainloop
     root.destroy()  # beugt einem Fatal Python Error vor: PyEval_RestoreThread: NULL tstate
 
+        
+fig=Figure(figsize=(4,4), dpi=100)     
+plotBody = fig.add_subplot(111, projection='3d')    
+#=========================================================================================================================
 ###----------------------###    
 ###     TKGui design     ###
 ###----------------------###
-strBackground='white'
-##erstellung Frames    
-mainFrameLeft=Frame(master=root)
-mainFrameRight=Frame(master=root)
-mainFrameCenter=Frame(master=root)    
-mainFrameLeft.pack(side=LEFT,padx=5, pady=5)
-mainFrameCenter.pack(side=LEFT,padx=5, pady=5)    
-mainFrameRight.pack(side=RIGHT,padx=5, pady=5)    
-mainFrameLeft.configure(background=strBackground)
-mainFrameRight.configure(background=strBackground)
-mainFrameCenter.configure(background=strBackground)
+class Application(Frame):        
+    def __init__(self,master=None):
+        
+        #startet die tk umgebung
+        Frame.__init__(self, master)
+        self.master.title("3D-Controll")    
+        strBackground='white'
+        ##erstellung Frames    
+        self.mainFrameLeft=Frame(master)
+        self.mainFrameRight=Frame(master)
+        self.mainFrameCenter=Frame(master)    
+        self.mainFrameLeft.pack(side=LEFT,padx=5, pady=5)
+        self.mainFrameCenter.pack(side=LEFT,padx=5, pady=5)    
+        self.mainFrameRight.pack(side=RIGHT,padx=5, pady=5)    
+        self.mainFrameLeft.configure(background=strBackground)
+        self.mainFrameRight.configure(background=strBackground)
+        self.mainFrameCenter.configure(background=strBackground)
+        buttonComC = Button(self.mainFrameCenter, text='Com Port Connect', command=_comC)
+        buttonComC.pack(side=BOTTOM,anchor = 's')
+        Application.centerFrame(self)
+        Application.rightFrame(self)
+        Application.leftFrame(self)
+        
+    def centerFrame(self):
+        global fig
+        #figure in canvas erzeugen 
+        canvas = FigureCanvasTkAgg(fig, self.mainFrameCenter)
+        canvas.show()
+        canvas.get_tk_widget().pack(side=Tk.TOP,anchor = 'center', fill=Tk.BOTH, expand=3)
+        
+    def rightFrame(self):
+        strBackground='white'
+        framePlotSettings=Frame(self.mainFrameRight)
+        framePlotSettings.pack(side=TOP,anchor = 'n',padx=30, pady=30)
+        framePlotSettings.configure(background=strBackground)
+        #ratiobutton erzeugen----------------------------------------------
+        auswahl=["Torus","Kegel"]
+        auswahlParam=Tk.StringVar()
+        auswahlParam.set("Torus")
+        def _settingParam():
+            toSet=auswahlParam.get()
+            if toSet=="Torus":
+                _ParamTorus()
+            if toSet=="Kegel":
+                _ParamKegel()
+        for text in auswahl:
+            but=Radiobutton(framePlotSettings,text=text,value=text,padx = 20, variable=auswahlParam, command=_settingParam,background=strBackground)
+            but.pack(side=TOP,anchor = 'n')
+        #button erzeugen---------------------------------------------------    
+        buttonQuit = Button(framePlotSettings, text='Quit', command=_quit)
+        buttonQuit.pack(side=BOTTOM,anchor = 'center')
+        buttonComC = Button(framePlotSettings, text='Com Port Connect', command=_comC)
+        buttonComC.pack(side=BOTTOM,anchor = 's')
+        #Tz = Text(master=framePlotSettings, height=2, width=5)
+        #Tz.insert(END,"-z->")
+        #Tz.pack(side=BOTTOM)
+        #MotorControllButton---------------------------------------------------------------------------
+        frameMotorControll=Frame(self.mainFrameRight)
+        frameMotorControll.pack(side=BOTTOM,anchor = 's',padx=30, pady=30)
+        frameMotorControll.configure(background=strBackground)
+        #--
 
-#==========================================================================================
-##frameLeft
-button1 = Button(master=mainFrameLeft, text='Quit', command=_quit)
-button1.pack(side=BOTTOM,anchor = 'center')
-#==========================================================================================
-#frameCenter
-#figure in canvas erzeugen 
-fig=Figure(figsize=(4,4), dpi=100) 
-canvas = FigureCanvasTkAgg(fig, master=mainFrameCenter)
-canvas.show()
-canvas.get_tk_widget().pack(side=Tk.TOP,anchor = 'center', fill=Tk.BOTH, expand=3)
-plotBody = fig.add_subplot(111, projection='3d')
+        #x,y,z=Body.readSensor(B1)
+        controllWidth=3
+        buttonPhiP=Button(frameMotorControll, text='+', command=_quit,width=controllWidth)
+        buttonPhiM=Button(frameMotorControll, text='-', command=_quit,width=controllWidth)
+        buttonTetaP=Button(frameMotorControll, text='+', command=_quit,width=controllWidth)
+        buttonTetaM=Button(frameMotorControll, text='-', command=_quit,width=controllWidth)
+        buttonPsiP=Button(frameMotorControll, text='+', command=_quit,width=controllWidth)
+        buttonPsiM=Button(frameMotorControll, text='-', command=_quit,width=controllWidth)
+        rollLab = Label(frameMotorControll, text="\u03A6",background=strBackground)
+        pitchLab = Label(frameMotorControll, text="\u0398",background=strBackground)
+        yawLab = Label(frameMotorControll, text="\u03A8",background=strBackground)
+        #rollShow = Label(master=frameMotorControll, text=,background=strBackground)
+        #pitchShow = Label(master=frameMotorControll, text=repr(y),background=strBackground)
+        #yawShow = Label(master=frameMotorControll, text=repr(z),background=strBackground)
+        #print(tiltSave[0])
+        #def showTilt():
+         #canvasRollShow = Canvas(master=frameMotorControll)
+         #iptext=canvasRollShow.create_text( 1,1,anchor="nw")
+         #canvasRollShow.grid(row=3, column=0)
+         #canvasRollShow.itemconfigure(iptext, text=str(tiltSave[0]))
+        #frameMotorControll.after(1, showTilt)
 
+        #--
+        #rollShow.grid(row=3, column=0)
+        #pitchShow.grid(row=3, column=1)
+        #yawShow.grid(row=3, column=2)
+        rollLab.grid(row=1, column=0)
+        pitchLab.grid(row=1, column=1)
+        yawLab.grid(row=1, column=2)
+        buttonPhiP.grid(row=0, column=0,padx=2)
+        buttonPhiM.grid(row=2, column=0,padx=2)
+        buttonTetaP.grid(row=0, column=1,padx=2)
+        buttonTetaM.grid(row=2, column=1,padx=2)
+        buttonPsiP.grid(row=0, column=2,padx=2)
+        buttonPsiM.grid(row=2, column=2,padx=2)
 
-#==========================================================================================
-#frameRight
-#------------------------------------------------------------------------------------------
-framePlotSettings=Frame(master=mainFrameRight)
-framePlotSettings.pack(side=TOP,anchor = 'n',padx=30, pady=30)
-framePlotSettings.configure(background=strBackground)
-#ratiobutton erzeugen----------------------------------------------
-auswahl=["Torus","Kegel"]
-auswahlParam=Tk.StringVar()
-auswahlParam.set("Torus")
-def _settingParam():
-    toSet=auswahlParam.get()
-    if toSet=="Torus":
-        _ParamTorus()
-    if toSet=="Kegel":
-        _ParamKegel()
-for text in auswahl:
-    but=Radiobutton(master=framePlotSettings,text=text,value=text,padx = 20, variable=auswahlParam, command=_settingParam,background=strBackground)
-    but.pack(side=TOP,anchor = 'n')
-#button erzeugen---------------------------------------------------    
-buttonQuit = Button(master=framePlotSettings, text='Quit', command=_quit)
-buttonQuit.pack(side=BOTTOM,anchor = 'center')
-buttonComC = Button(master=framePlotSettings, text='Com Port Connect', command=_comC)
-buttonComC.pack(side=BOTTOM,anchor = 's')
-Tz = Text(master=framePlotSettings, height=2, width=30)
-Tz.insert(END,"-z->")
-Tz.pack(side=BOTTOM)
-#MotorControllButton---------------------------------------------------------------------------
-frameMotorControll=Frame(master=mainFrameRight)
-frameMotorControll.pack(side=BOTTOM,anchor = 's',padx=30, pady=30)
-frameMotorControll.configure(background=strBackground)
-#--
-
-x,y,z=Body.readSensor(B1)
-controllWidth=3
-buttonPhiP=Button(master=frameMotorControll, text='+', command=_quit,width=controllWidth)
-buttonPhiM=Button(master=frameMotorControll, text='-', command=_quit,width=controllWidth)
-buttonTetaP=Button(master=frameMotorControll, text='+', command=_quit,width=controllWidth)
-buttonTetaM=Button(master=frameMotorControll, text='-', command=_quit,width=controllWidth)
-buttonPsiP=Button(master=frameMotorControll, text='+', command=_quit,width=controllWidth)
-buttonPsiM=Button(master=frameMotorControll, text='-', command=_quit,width=controllWidth)
-rollLab = Label(master=frameMotorControll, text="\u03A6",background=strBackground)
-pitchLab = Label(master=frameMotorControll, text="\u0398",background=strBackground)
-yawLab = Label(master=frameMotorControll, text="\u03A8",background=strBackground)
-#rollShow = Label(master=frameMotorControll, text=repr(x),background=strBackground)
-pitchShow = Label(master=frameMotorControll, text=repr(y),background=strBackground)
-yawShow = Label(master=frameMotorControll, text=repr(z),background=strBackground)
-#canvasRollShow = Canvas(master=frameMotorControll)
-#canvasRollShow.create_text(text=repr(x))
-#canvasRollShow.grid(row=3, column=0)
-#--
-#rollShow.grid(row=3, column=0)
-pitchShow.grid(row=3, column=1)
-yawShow.grid(row=3, column=2)
-rollLab.grid(row=1, column=0)
-pitchLab.grid(row=1, column=1)
-yawLab.grid(row=1, column=2)
-buttonPhiP.grid(row=0, column=0,padx=2)
-buttonPhiM.grid(row=2, column=0,padx=2)
-buttonTetaP.grid(row=0, column=1,padx=2)
-buttonTetaM.grid(row=2, column=1,padx=2)
-buttonPsiP.grid(row=0, column=2,padx=2)
-buttonPsiM.grid(row=2, column=2,padx=2)
-
-
-
+    def leftFrame(self):
+        button1 = Button(self.mainFrameLeft, text='Quit', command=_quit)
+        button1.pack(side=BOTTOM,anchor = 'center')
+        
+       
+        
+app = Application(master=root)    
+#erzeugt ein element body
+B1=Body()     
 ani = animation.FuncAnimation(fig, UpdatePlotWidget, interval=1)
-Tk.mainloop()
+#ani = animation.FuncAnimation(fig, UpdatePlotWidget, interval=1)
+app.mainloop()
