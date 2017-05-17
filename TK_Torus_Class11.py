@@ -61,9 +61,23 @@ def UpdatePlotWidget(i):
     plotBody.set_zlabel('Z axis')
     print(basePhi)
 
-def increaseVal():
+def increasePhi():
+    global basePhi
+    basePhi+=1
+def decreasePhi():
+    global basePhi
+    basePhi-=1
+def increaseTeta():
+    global baseTeta
+    baseTeta+=1
+def decreaseTeta():
+    global baseTeta
+    baseTeta-=1
+def increasePsi():
+    global basePsi
     basePsi+=1
-def decreaseVal():
+def decreasePsi():
+    global basePsi
     basePsi-=1
     
 class Body:
@@ -247,12 +261,12 @@ frameMotorControll.configure(background=strBackground)
 
 x,y,z=Body.readSensor(B1)
 controllWidth=3
-buttonPhiP=Button(master=frameMotorControll, text='+', command=increaseVal(),width=controllWidth)
-buttonPhiM=Button(master=frameMotorControll, text='-', command=decreaseVal(),width=controllWidth)
-buttonTetaP=Button(master=frameMotorControll, text='+', command=increaseVal(),width=controllWidth)
-buttonTetaM=Button(master=frameMotorControll, text='-', command=decreaseVal(),width=controllWidth)
-buttonPsiP=Button(master=frameMotorControll, text='+', command=increaseVal(),width=controllWidth)
-buttonPsiM=Button(master=frameMotorControll, text='-', command=decreaseVal(),width=controllWidth)
+buttonPhiP=Button(master=frameMotorControll, text='+', command=increasePhi(),width=controllWidth)
+buttonPhiM=Button(master=frameMotorControll, text='-', command=decreasePhi(),width=controllWidth)
+buttonTetaP=Button(master=frameMotorControll, text='+', command=increaseTeta(),width=controllWidth)
+buttonTetaM=Button(master=frameMotorControll, text='-', command=decreaseTeta(),width=controllWidth)
+buttonPsiP=Button(master=frameMotorControll, text='+', command=increasePsi(),width=controllWidth)
+buttonPsiM=Button(master=frameMotorControll, text='-', command=decreasePsi(),width=controllWidth)
 rollLab = Label(master=frameMotorControll, text="\u03A6",background=strBackground)
 pitchLab = Label(master=frameMotorControll, text="\u0398",background=strBackground)
 yawLab = Label(master=frameMotorControll, text="\u03A8",background=strBackground)
@@ -263,7 +277,7 @@ yawShow = Label(master=frameMotorControll, text=repr(z),background=strBackground
 #canvasRollShow.create_text(text=repr(x))
 #canvasRollShow.grid(row=3, column=0)
 #--
-#rollShow.grid(row=3, column=0)
+rollShow.grid(row=3, column=0)
 pitchShow.grid(row=3, column=1)
 yawShow.grid(row=3, column=2)
 rollLab.grid(row=1, column=0)
@@ -275,7 +289,6 @@ buttonTetaP.grid(row=0, column=1,padx=2)
 buttonTetaM.grid(row=2, column=1,padx=2)
 buttonPsiP.grid(row=0, column=2,padx=2)
 buttonPsiM.grid(row=2, column=2,padx=2)
-
 
 
 ani = animation.FuncAnimation(fig, UpdatePlotWidget, interval=1)
