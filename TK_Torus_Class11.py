@@ -38,7 +38,7 @@ ser.baudrate = 9600
 ser.port = 'COM5'
 
 def _say_hi():
-    print("hey")
+    ("hey")
     
 def UpdatePlotWidget(i):
     global plotBody
@@ -97,8 +97,6 @@ class Body:
         ##nummeric SinCos Calc 
         drawRectangle(xspeed=calculateSpeed(listval=speedfield[0], val = phi), yspeed=calculateSpeed(listval=speedfield[1], val = teta), zspeed=calculateSpeed(listval=speedfield[2], val = psi))
         speedfield[0],speedfield[1],speedfield[2]=psi,teta,psi
-        print(phi,teta,psi)
-        print('----')
         sinPhi =np.sin(phi)
         cosPhi =np.cos(phi)
         cosTeta=np.cos(teta)
@@ -131,7 +129,10 @@ def _comC():
         ser.open()
     except serial.serialutil.SerialException:
         ser.port = 'COM4'
-        _comC()
+        try:
+            ser.open()
+        except serial.serialutil.SerialException as e:
+            return e
 def _quit():
     root.quit()     # stop mainloop
     root.destroy()  # beugt einem Fatal Python Error vor: PyEval_RestoreThread: NULL tstate
@@ -185,10 +186,7 @@ def drawRectangle(xspeed,yspeed,zspeed):
     sml.create_rectangle(0,100,52,xspeed+100, fill='black')
     smc.create_rectangle(0,100,52,yspeed+100, fill='black')
     smr.create_rectangle(0,100,52,zspeed+100, fill='black')
-    #print(xspeed)
-    #print(yspeed)
-    #print(zspeed)
-    #print('----')
+
 
 def calculateSpeed(listval,val):
     aspeed=val - listval
