@@ -4,3 +4,9 @@ Die Buttons selbst reagieren nicht auf ein drücken. wat?
 Ich habe keine state = true gesehen bei den buttons, also frage ich mich warum _say_hi() 6 mal ausgelöst wird. Es sind 6
 Buttons, also liegt es nahe, dass alle einaml zum Start "gedrückt" werden. Ich glaube nicht, dass es an dem Grid liegt,
 aber mehr fällt mir da auch nicht ein.
+
+
+---
+
+Problem gelöst: bei dem command=function eines Buttons darf kein () dahinter stehen. Mit () wird die function 
+einmal ausgeführt. Ohne gilt der Name der function als reference für command.
