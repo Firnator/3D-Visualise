@@ -154,10 +154,10 @@ leftLeftFrame.pack(side=LEFT,padx=5, pady=5)
 centerLeftFrame.pack(side=LEFT,padx=5, pady=5)    
 rightLeftFrame.pack(side=RIGHT,padx=5, pady=5) 
 
-#Speedmeter
+#Speedometer
 
 sml = Canvas(leftLeftFrame, width=50, height=200)
-smc = Canvas(centerLeftFrame, width=50, height=200) # Canvas for Speedmeter
+smc = Canvas(centerLeftFrame, width=50, height=200) # Canvas for Speedometer
 smr = Canvas(rightLeftFrame, width=50, height=200)
 sml.pack()
 smc.pack()
