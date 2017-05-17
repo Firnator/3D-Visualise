@@ -7,6 +7,7 @@ by MARVIN GLOTH
 =========================
 '''
 import matplotlib
+from unittest.mock import right
 matplotlib.use("TkAgg")
 import matplotlib.pyplot as plt
 import numpy as np
@@ -34,7 +35,7 @@ root.wm_title("3D-Controll")
 ###start datawork
 ser = serial.Serial()
 ser.baudrate = 9600
-ser.port = 'COM5'
+ser.port = 'COM4' #changed com 5 to com 4
 
 def _say_hi():
     print("hey")
@@ -52,7 +53,6 @@ def UpdatePlotWidget(i):
     plotBody.set_xlabel('X axis')
     plotBody.set_ylabel('Y axis')
     plotBody.set_zlabel('Z axis')
-    
     
     
 class Body:
@@ -76,17 +76,27 @@ class Body:
         
     def readSensor(self):
         if ser.is_open:
-            s =ser.readline().decode().split(',')
+            try:
+                s=ser.readline().decode().split(',')    #exception handler
+            except IndexError:
+                s=[0,0,0,0]
         else:
             s=[0,0,0,0]
-        phi=float(s[0])*np.pi/180
-        teta=float(s[1])*np.pi/180
-        psi=float(s[2])*np.pi/180
+        try:
+            phi=float(s[0])*np.pi/180
+            teta=float(s[1])*np.pi/180
+            psi=float(s[2])*np.pi/180
+        except ValueError:
+            phi=speedfield[0]
+            teta=speedfield[1]
+            psi=speedfield[2]
         return phi,teta,psi
         
     def updatePos(self):
         phi,teta,psi=Body.readSensor(self)
         ##nummeric SinCos Calc 
+        drawRectangle(xspeed=calculateSpeed(listval=speedfield[0], val = phi), yspeed=calculateSpeed(listval=speedfield[1], val = teta), zspeed=calculateSpeed(listval=speedfield[2], val = psi))
+        speedfield[0],speedfield[1],speedfield[2]=psi,teta,psi
         sinPhi =np.sin(phi)
         cosPhi =np.cos(phi)
         cosTeta=np.cos(teta)
@@ -137,8 +147,39 @@ mainFrameCenter.configure(background=strBackground)
 
 #==========================================================================================
 ##frameLeft
-button1 = Button(master=mainFrameLeft, text='Quit', command=_quit)
-button1.pack(side=BOTTOM,anchor = 'center')
+leftLeftFrame = Frame(master = mainFrameLeft)
+centerLeftFrame= Frame(master = mainFrameLeft)
+rightLeftFrame = Frame(master = mainFrameLeft)
+leftLeftFrame.pack(side=LEFT,padx=5, pady=5)
+centerLeftFrame.pack(side=LEFT,padx=5, pady=5)    
+rightLeftFrame.pack(side=RIGHT,padx=5, pady=5) 
+
+#Speedmeter
+
+sml = Canvas(leftLeftFrame, width=50, height=200)
+smc = Canvas(centerLeftFrame, width=50, height=200) # Canvas for Speedmeter
+smr = Canvas(rightLeftFrame, width=50, height=200)
+sml.pack()
+smc.pack()
+smr.pack()
+#sml.create_line(0,100,52,100, fill = 'red')
+#smc.create_line(0,100,52,100, fill = 'red')
+#smr.create_line(0,100,52,100, fill = 'red')
+
+speedfield=[0,0,0]   #stores last phi,teta,psi for use in calculateSpeed()
+
+def drawRectangle(xspeed,yspeed,zspeed):
+    sml.create_rectangle(0,100,52,xspeed+100, fill='black')
+    smc.create_rectangle(0,100,52,yspeed+100, fill='black')
+    smr.create_rectangle(0,100,52,zspeed+100, fill='black')
+    print(xspeed)
+    print(yspeed)
+    print(zspeed)
+    print('----')
+
+def calculateSpeed(listval,val):
+    aspeed=val - listval
+    return aspeed*100
 #==========================================================================================
 #frameCenter
 #figure in canvas erzeugen 
