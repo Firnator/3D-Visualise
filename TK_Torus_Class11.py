@@ -25,6 +25,12 @@ if sys.version_info[0] < 3:
     import Tkinter as Tk
 else:
     import tkinter as Tk
+
+
+basePhi = 0
+baseTeta = 0
+basePsi = 0
+
 root = Tk.Tk()
 #root.resizable(width=False,height=False)
 root.configure(background='white')
@@ -53,7 +59,12 @@ def UpdatePlotWidget(i):
     plotBody.set_xlabel('X axis')
     plotBody.set_ylabel('Y axis')
     plotBody.set_zlabel('Z axis')
-    
+    print(basePhi)
+
+def increaseVal():
+    basePsi+=1
+def decreaseVal():
+    basePsi-=1
     
 class Body:
     def __init__(self):
@@ -79,9 +90,9 @@ class Body:
             try:
                 s=ser.readline().decode().split(',')    #exception handler
             except IndexError:
-                s=[0,0,0,0]
+                s=[basePhi,baseTeta,basePsi,0]
         else:
-            s=[0,0,0,0]
+            s=[basePhi,baseTeta,basePsi,0]
         try:
             phi=float(s[0])*np.pi/180
             teta=float(s[1])*np.pi/180
@@ -236,12 +247,12 @@ frameMotorControll.configure(background=strBackground)
 
 x,y,z=Body.readSensor(B1)
 controllWidth=3
-buttonPhiP=Button(master=frameMotorControll, text='+', command=_say_hi(),width=controllWidth)
-buttonPhiM=Button(master=frameMotorControll, text='-', command=_say_hi(),width=controllWidth)
-buttonTetaP=Button(master=frameMotorControll, text='+', command=_say_hi(),width=controllWidth)
-buttonTetaM=Button(master=frameMotorControll, text='-', command=_say_hi(),width=controllWidth)
-buttonPsiP=Button(master=frameMotorControll, text='+', command=_say_hi(),width=controllWidth)
-buttonPsiM=Button(master=frameMotorControll, text='-', command=_say_hi(),width=controllWidth)
+buttonPhiP=Button(master=frameMotorControll, text='+', command=increaseVal(),width=controllWidth)
+buttonPhiM=Button(master=frameMotorControll, text='-', command=decreaseVal(),width=controllWidth)
+buttonTetaP=Button(master=frameMotorControll, text='+', command=increaseVal(),width=controllWidth)
+buttonTetaM=Button(master=frameMotorControll, text='-', command=decreaseVal(),width=controllWidth)
+buttonPsiP=Button(master=frameMotorControll, text='+', command=increaseVal(),width=controllWidth)
+buttonPsiM=Button(master=frameMotorControll, text='-', command=decreaseVal(),width=controllWidth)
 rollLab = Label(master=frameMotorControll, text="\u03A6",background=strBackground)
 pitchLab = Label(master=frameMotorControll, text="\u0398",background=strBackground)
 yawLab = Label(master=frameMotorControll, text="\u03A8",background=strBackground)
