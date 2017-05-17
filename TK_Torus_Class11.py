@@ -86,7 +86,7 @@ class Body:
             phi=float(s[0])*np.pi/180
             teta=float(s[1])*np.pi/180
             psi=float(s[2])*np.pi/180
-        except ValueError:
+        except (ValueError,IndexError):
             phi=speedfield[0]
             teta=speedfield[1]
             psi=speedfield[2]
@@ -97,6 +97,8 @@ class Body:
         ##nummeric SinCos Calc 
         drawRectangle(xspeed=calculateSpeed(listval=speedfield[0], val = phi), yspeed=calculateSpeed(listval=speedfield[1], val = teta), zspeed=calculateSpeed(listval=speedfield[2], val = psi))
         speedfield[0],speedfield[1],speedfield[2]=psi,teta,psi
+        print(phi,teta,psi)
+        print('----')
         sinPhi =np.sin(phi)
         cosPhi =np.cos(phi)
         cosTeta=np.cos(teta)
@@ -169,13 +171,16 @@ smr.pack()
 speedfield=[0,0,0]   #stores last phi,teta,psi for use in calculateSpeed()
 
 def drawRectangle(xspeed,yspeed,zspeed):
+    sml.delete('all')
+    smc.delete('all')
+    smr.delete('all')
     sml.create_rectangle(0,100,52,xspeed+100, fill='black')
     smc.create_rectangle(0,100,52,yspeed+100, fill='black')
     smr.create_rectangle(0,100,52,zspeed+100, fill='black')
-    print(xspeed)
-    print(yspeed)
-    print(zspeed)
-    print('----')
+    #print(xspeed)
+    #print(yspeed)
+    #print(zspeed)
+    #print('----')
 
 def calculateSpeed(listval,val):
     aspeed=val - listval
