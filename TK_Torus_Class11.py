@@ -7,6 +7,7 @@ by MARVIN GLOTH
 =========================
 '''
 import matplotlib
+from unittest.mock import right
 matplotlib.use("TkAgg")
 import matplotlib.pyplot as plt
 import numpy as np
@@ -22,6 +23,12 @@ if sys.version_info[0] < 3:
     import Tkinter as Tk
 else:
     import tkinter as Tk
+
+
+basePhi = 0
+baseTeta = 0
+basePsi = 0
+
 root = Tk.Tk()
 #root.wm_title("3D-Controll")
 
@@ -31,6 +38,7 @@ ser = serial.Serial()
 ser.baudrate = 9600
 ser.port = 'COM5'
 
+    
 def UpdatePlotWidget(i):
     global plotBody
     x,y,z=Body.updatePos(B1)
@@ -45,7 +53,37 @@ def UpdatePlotWidget(i):
     plotBody.set_ylabel('Y axis')
     plotBody.set_zlabel('Z axis')
 
+<<<<<<< HEAD
 tiltSave=[0,0,0,0]    
+=======
+def increasePhi():
+    global basePhi
+    basePhi+=1
+def decreasePhi():
+    global basePhi
+    basePhi-=1
+def increaseTeta():
+    global baseTeta
+    baseTeta+=1
+def decreaseTeta():
+    global baseTeta
+    baseTeta-=1
+def increasePsi():
+    global basePsi
+    basePsi+=1
+def decreasePsi():
+    global basePsi
+    basePsi-=1
+    
+def baseReset():
+    global basePhi
+    global basePsi
+    global baseTeta
+    basePhi = 0
+    basePsi = 0
+    baseTeta = 0
+    
+>>>>>>> branch 'master' of https://github.com/Firnator/3D-Visualise.git
 class Body:
     def __init__(self):
         Body.ParamTorus(self,10,2) #bei initialisierung wird im Konstruktor der Körper Parametrisiert
@@ -68,14 +106,35 @@ class Body:
     def updatePos(self):
         global tiltSave
         if ser.is_open:
-            s =ser.readline().decode().split(',')
+            try:
+                s=ser.readline().decode().split(',')    #exception handler
+            except IndexError:
+                s=[basePhi,baseTeta,basePsi,0]
         else:
+<<<<<<< HEAD
             s=[0,0,0,0]
         tiltSave=s
         phi=float(s[0])*np.pi/180
         teta=float(s[1])*np.pi/180
         psi=float(s[2])*np.pi/180
+=======
+            s=[basePhi,baseTeta,basePsi,0]
+        try:
+            phi=float(s[0])*np.pi/180
+            teta=float(s[1])*np.pi/180
+            psi=float(s[2])*np.pi/180
+        except (ValueError,IndexError):
+            phi=speedfield[0]
+            teta=speedfield[1]
+            psi=speedfield[2]
+        return phi,teta,psi
+        
+    def updatePos(self):
+        phi,teta,psi=Body.readSensor(self)
+>>>>>>> branch 'master' of https://github.com/Firnator/3D-Visualise.git
         ##nummeric SinCos Calc 
+        drawRectangle(xspeed=calculateSpeed(listval=speedfield[0], val = phi), yspeed=calculateSpeed(listval=speedfield[1], val = teta), zspeed=calculateSpeed(listval=speedfield[2], val = psi))
+        speedfield[0],speedfield[1],speedfield[2]=phi,teta,psi
         sinPhi =np.sin(phi)
         cosPhi =np.cos(phi)
         cosTeta=np.cos(teta)
@@ -103,7 +162,14 @@ def _ParamTorus():
 def _ParamKegel():
     Body.ParamKegel(B1,10,10)
 def _comC():
-    ser.open()   
+    try:
+        ser.open()
+    except serial.serialutil.SerialException:
+        ser.port = 'COM4'
+        try:
+            ser.open()
+        except serial.serialutil.SerialException as e:
+            return e
 def _quit():
     root.quit()     # stop mainloop
     root.destroy()  # beugt einem Fatal Python Error vor: PyEval_RestoreThread: NULL tstate
@@ -177,6 +243,7 @@ class Application(Frame):
         frameMotorControll.configure(background=strBackground)
         #--
 
+<<<<<<< HEAD
         #x,y,z=Body.readSensor(B1)
         controllWidth=3
         buttonPhiP=Button(frameMotorControll, text='+', command=_quit,width=controllWidth)
@@ -198,6 +265,55 @@ class Application(Frame):
          #canvasRollShow.grid(row=3, column=0)
          #canvasRollShow.itemconfigure(iptext, text=str(tiltSave[0]))
         #frameMotorControll.after(1, showTilt)
+=======
+#==========================================================================================
+##frameLeft
+leftLeftFrame = Frame(master = mainFrameLeft,background=strBackground)
+centerLeftFrame= Frame(master = mainFrameLeft,background=strBackground)
+rightLeftFrame = Frame(master = mainFrameLeft,background=strBackground)
+leftLeftFrame.pack(side=LEFT,padx=5, pady=5)
+centerLeftFrame.pack(side=LEFT,padx=5, pady=5)    
+rightLeftFrame.pack(side=RIGHT,padx=5, pady=5) 
+
+#Speedometer
+
+sml = Canvas(leftLeftFrame, width=50, height=200)
+smc = Canvas(centerLeftFrame, width=50, height=200) # Canvas for Speedometer
+smr = Canvas(rightLeftFrame, width=50, height=200)
+sml.pack(side='top')
+smc.pack(side='top')
+smr.pack(side='top')
+leftRollLab = Label(master=leftLeftFrame, text="\u03A6",background=strBackground)
+leftPitchLab = Label(master=centerLeftFrame, text="\u0398",background=strBackground)
+leftYawLab = Label(master=rightLeftFrame, text="\u03A8",background=strBackground)
+
+leftRollLab.pack(side='bottom')
+leftPitchLab.pack(side='bottom')
+leftYawLab.pack(side='bottom')
+
+speedfield=[0,0,0]   #stores last phi,teta,psi for use in calculateSpeed()
+
+def drawRectangle(xspeed,yspeed,zspeed):
+    sml.delete('all')
+    smc.delete('all')
+    smr.delete('all')
+    sml.create_rectangle(0,100,52,xspeed+100, fill='black')
+    smc.create_rectangle(0,100,52,yspeed+100, fill='black')
+    smr.create_rectangle(0,100,52,zspeed+100, fill='black')
+
+
+def calculateSpeed(listval,val):
+    aspeed=val - listval
+    return aspeed*100
+#==========================================================================================
+#frameCenter
+#figure in canvas erzeugen 
+fig=Figure(figsize=(4,4), dpi=100) 
+canvas = FigureCanvasTkAgg(fig, master=mainFrameCenter)
+canvas.show()
+canvas.get_tk_widget().pack(side=Tk.TOP,anchor = 'center', fill=Tk.BOTH, expand=3)
+plotBody = fig.add_subplot(111, projection='3d')
+>>>>>>> branch 'master' of https://github.com/Firnator/3D-Visualise.git
 
         #--
         #rollShow.grid(row=3, column=0)
@@ -213,6 +329,7 @@ class Application(Frame):
         buttonPsiP.grid(row=0, column=2,padx=2)
         buttonPsiM.grid(row=2, column=2,padx=2)
 
+<<<<<<< HEAD
     def leftFrame(self):
         button1 = Button(self.mainFrameLeft, text='Quit', command=_quit)
         button1.pack(side=BOTTOM,anchor = 'center')
@@ -222,6 +339,77 @@ class Application(Frame):
 app = Application(master=root)    
 #erzeugt ein element body
 B1=Body()     
+=======
+#==========================================================================================
+#frameRight
+#------------------------------------------------------------------------------------------
+framePlotSettings=Frame(master=mainFrameRight)
+framePlotSettings.pack(side=TOP,anchor = 'n',padx=30, pady=30)
+framePlotSettings.configure(background=strBackground)
+#ratiobutton erzeugen----------------------------------------------
+auswahl=["Torus","Kegel"]
+auswahlParam=Tk.StringVar()
+auswahlParam.set("Torus")
+def _settingParam():
+    toSet=auswahlParam.get()
+    if toSet=="Torus":
+        _ParamTorus()
+    if toSet=="Kegel":
+        _ParamKegel()
+for text in auswahl:
+    but=Radiobutton(master=framePlotSettings,text=text,value=text,padx = 20, variable=auswahlParam, command=_settingParam,background=strBackground)
+    but.pack(side=TOP,anchor = 'n')
+#button erzeugen---------------------------------------------------    
+buttonQuit = Button(master=framePlotSettings, text='Quit', command=_quit)
+buttonQuit.pack(side=BOTTOM,anchor = 'center')
+buttonComC = Button(master=framePlotSettings, text='Com Port Connect', command=_comC)
+buttonComC.pack(side=BOTTOM,anchor = 's')
+Tz = Text(master=framePlotSettings, height=2, width=30)
+Tz.insert(END,"-z->")
+Tz.pack(side=BOTTOM)
+#MotorControllButton---------------------------------------------------------------------------
+frameMotorControll=Frame(master=mainFrameRight)
+frameMotorControll.pack(side=BOTTOM,anchor = 's',padx=30, pady=30)
+frameMotorControll.configure(background=strBackground)
+#--
+
+x,y,z=Body.readSensor(B1)
+controllWidth=3
+buttonPhiP=Button(master=frameMotorControll, text='+', command=increasePhi,width=controllWidth)
+buttonPhiM=Button(master=frameMotorControll, text='-', command=decreasePhi,width=controllWidth)
+buttonTetaP=Button(master=frameMotorControll, text='+', command=increaseTeta,width=controllWidth)
+buttonTetaM=Button(master=frameMotorControll, text='-', command=decreaseTeta,width=controllWidth)
+buttonPsiP=Button(master=frameMotorControll, text='+', command=increasePsi,width=controllWidth)
+buttonPsiM=Button(master=frameMotorControll, text='-', command=decreasePsi,width=controllWidth)
+rollLab = Label(master=frameMotorControll, text="\u03A6",background=strBackground)
+pitchLab = Label(master=frameMotorControll, text="\u0398",background=strBackground)
+yawLab = Label(master=frameMotorControll, text="\u03A8",background=strBackground)
+rollShow = Label(master=frameMotorControll, text=repr(x),background=strBackground)
+pitchShow = Label(master=frameMotorControll, text=repr(y),background=strBackground)
+yawShow = Label(master=frameMotorControll, text=repr(z),background=strBackground)
+
+resetButton = Button(master = frameMotorControll, text='Reset',command=baseReset)
+#resetButton.pack(side = 'bottom',anchor='s')
+#canvasRollShow = Canvas(master=frameMotorControll)
+#canvasRollShow.create_text(text=repr(x))
+#canvasRollShow.grid(row=3, column=0)
+#--
+resetButton.grid(row=0,column = 1,pady=20)
+rollShow.grid(row=4, column=0)
+pitchShow.grid(row=4, column=1)
+yawShow.grid(row=4, column=2)
+rollLab.grid(row=2, column=0)
+pitchLab.grid(row=2, column=1)
+yawLab.grid(row=2, column=2)
+buttonPhiP.grid(row=1, column=0,padx=2)
+buttonPhiM.grid(row=3, column=0,padx=2)
+buttonTetaP.grid(row=1, column=1,padx=2)
+buttonTetaM.grid(row=3, column=1,padx=2)
+buttonPsiP.grid(row=1, column=2,padx=2)
+buttonPsiM.grid(row=3, column=2,padx=2)
+
+
+>>>>>>> branch 'master' of https://github.com/Firnator/3D-Visualise.git
 ani = animation.FuncAnimation(fig, UpdatePlotWidget, interval=1)
 #ani = animation.FuncAnimation(fig, UpdatePlotWidget, interval=1)
 app.mainloop()
