@@ -1,0 +1,6 @@
+Ich hab mal von den Buttons im Control Panel die _quit() durch die _say_hi() ersetzt, da das Programm sich immer
+direkt nach dem start öffnete.Nun steht in der Console 6 mal "hey".
+Die Buttons selbst reagieren nicht auf ein drücken. wat?
+Ich habe keine state = true gesehen bei den buttons, also frage ich mich warum _say_hi() 6 mal ausgelöst wird. Es sind 6
+Buttons, also liegt es nahe, dass alle einaml zum Start "gedrückt" werden. Ich glaube nicht, dass es an dem Grid liegt,
+aber mehr fällt mir da auch nicht ein.
