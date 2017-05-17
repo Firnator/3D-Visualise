@@ -57,7 +57,6 @@ def UpdatePlotWidget(i):
     plotBody.set_xlabel('X axis')
     plotBody.set_ylabel('Y axis')
     plotBody.set_zlabel('Z axis')
-    print(basePhi)
 
 def increasePhi():
     global basePhi
@@ -119,7 +118,7 @@ class Body:
         phi,teta,psi=Body.readSensor(self)
         ##nummeric SinCos Calc 
         drawRectangle(xspeed=calculateSpeed(listval=speedfield[0], val = phi), yspeed=calculateSpeed(listval=speedfield[1], val = teta), zspeed=calculateSpeed(listval=speedfield[2], val = psi))
-        speedfield[0],speedfield[1],speedfield[2]=psi,teta,psi
+        speedfield[0],speedfield[1],speedfield[2]=phi,teta,psi
         sinPhi =np.sin(phi)
         cosPhi =np.cos(phi)
         cosTeta=np.cos(teta)
