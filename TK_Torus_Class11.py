@@ -36,6 +36,9 @@ ser = serial.Serial()
 ser.baudrate = 9600
 ser.port = 'COM5'
 
+def _say_hi():
+    print("hey")
+    
 def UpdatePlotWidget(i):
     global plotBody
     x,y,z=Body.updatePos(B1)
@@ -49,6 +52,8 @@ def UpdatePlotWidget(i):
     plotBody.set_xlabel('X axis')
     plotBody.set_ylabel('Y axis')
     plotBody.set_zlabel('Z axis')
+    
+    
     
 class Body:
     def __init__(self):
@@ -179,12 +184,12 @@ frameMotorControll.configure(background=strBackground)
 
 x,y,z=Body.readSensor(B1)
 controllWidth=3
-buttonPhiP=Button(master=frameMotorControll, text='+', command=_quit,width=controllWidth)
-buttonPhiM=Button(master=frameMotorControll, text='-', command=_quit,width=controllWidth)
-buttonTetaP=Button(master=frameMotorControll, text='+', command=_quit,width=controllWidth)
-buttonTetaM=Button(master=frameMotorControll, text='-', command=_quit,width=controllWidth)
-buttonPsiP=Button(master=frameMotorControll, text='+', command=_quit,width=controllWidth)
-buttonPsiM=Button(master=frameMotorControll, text='-', command=_quit,width=controllWidth)
+buttonPhiP=Button(master=frameMotorControll, text='+', command=_say_hi(),width=controllWidth)
+buttonPhiM=Button(master=frameMotorControll, text='-', command=_say_hi(),width=controllWidth)
+buttonTetaP=Button(master=frameMotorControll, text='+', command=_say_hi(),width=controllWidth)
+buttonTetaM=Button(master=frameMotorControll, text='-', command=_say_hi(),width=controllWidth)
+buttonPsiP=Button(master=frameMotorControll, text='+', command=_say_hi(),width=controllWidth)
+buttonPsiM=Button(master=frameMotorControll, text='-', command=_say_hi(),width=controllWidth)
 rollLab = Label(master=frameMotorControll, text="\u03A6",background=strBackground)
 pitchLab = Label(master=frameMotorControll, text="\u0398",background=strBackground)
 yawLab = Label(master=frameMotorControll, text="\u03A8",background=strBackground)
