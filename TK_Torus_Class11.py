@@ -35,7 +35,7 @@ root.wm_title("3D-Controll")
 ###start datawork
 ser = serial.Serial()
 ser.baudrate = 9600
-ser.port = 'COM4' #changed com 5 to com 4
+ser.port = 'COM5'
 
 def _say_hi():
     print("hey")
@@ -127,7 +127,11 @@ def _ParamTorus():
 def _ParamKegel():
     Body.ParamKegel(B1,10,10)
 def _comC():
-    ser.open()   
+    try:
+        ser.open()
+    except serial.serialutil.SerialException:
+        ser.port = 'COM4'
+        _comC()
 def _quit():
     root.quit()     # stop mainloop
     root.destroy()  # beugt einem Fatal Python Error vor: PyEval_RestoreThread: NULL tstate
