@@ -77,6 +77,14 @@ def decreasePsi():
     global basePsi
     basePsi-=1
     
+def baseReset():
+    global basePhi
+    global basePsi
+    global baseTeta
+    basePhi = 0
+    basePsi = 0
+    baseTeta = 0
+    
 class Body:
     def __init__(self):
         Body.ParamTorus(self,10,5) #bei initialisierung wird im Konstruktor der Körper Parametrisiert
@@ -270,22 +278,26 @@ yawLab = Label(master=frameMotorControll, text="\u03A8",background=strBackground
 rollShow = Label(master=frameMotorControll, text=repr(x),background=strBackground)
 pitchShow = Label(master=frameMotorControll, text=repr(y),background=strBackground)
 yawShow = Label(master=frameMotorControll, text=repr(z),background=strBackground)
+
+resetButton = Button(master = frameMotorControll, text='Reset',command=baseReset)
+#resetButton.pack(side = 'bottom',anchor='s')
 #canvasRollShow = Canvas(master=frameMotorControll)
 #canvasRollShow.create_text(text=repr(x))
 #canvasRollShow.grid(row=3, column=0)
 #--
-rollShow.grid(row=3, column=0)
-pitchShow.grid(row=3, column=1)
-yawShow.grid(row=3, column=2)
-rollLab.grid(row=1, column=0)
-pitchLab.grid(row=1, column=1)
-yawLab.grid(row=1, column=2)
-buttonPhiP.grid(row=0, column=0,padx=2)
-buttonPhiM.grid(row=2, column=0,padx=2)
-buttonTetaP.grid(row=0, column=1,padx=2)
-buttonTetaM.grid(row=2, column=1,padx=2)
-buttonPsiP.grid(row=0, column=2,padx=2)
-buttonPsiM.grid(row=2, column=2,padx=2)
+resetButton.grid(row=0,column = 1,pady=20)
+rollShow.grid(row=4, column=0)
+pitchShow.grid(row=4, column=1)
+yawShow.grid(row=4, column=2)
+rollLab.grid(row=2, column=0)
+pitchLab.grid(row=2, column=1)
+yawLab.grid(row=2, column=2)
+buttonPhiP.grid(row=1, column=0,padx=2)
+buttonPhiM.grid(row=3, column=0,padx=2)
+buttonTetaP.grid(row=1, column=1,padx=2)
+buttonTetaM.grid(row=3, column=1,padx=2)
+buttonPsiP.grid(row=1, column=2,padx=2)
+buttonPsiM.grid(row=3, column=2,padx=2)
 
 
 ani = animation.FuncAnimation(fig, UpdatePlotWidget, interval=1)
