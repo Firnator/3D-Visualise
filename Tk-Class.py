@@ -153,6 +153,7 @@ class Application(Frame):
         
     def centerFrame(self):
         global fig
+        global bla
         #figure in canvas erzeugen 
         canvas = FigureCanvasTkAgg(fig, self.mainFrameCenter)
         canvas.show()
