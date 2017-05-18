@@ -34,7 +34,7 @@ ser.port = 'COM5'
 def UpdatePlotWidget(i):
     global plotBody
     x,y,z=Body.updatePos(B1)
-    plotBody.clear()#löscht den alten plot, damit nicht neue figuren auf alte geplotet werden
+    plotBody.clear()#loescht den alten plot, damit nicht neue figuren auf alte geplotet werden
     ##Plottet in die Figurenumgebung
     plotBody.plot_surface(x, y, z, rstride=1, cstride=1)#cmap=plt.cm.hot
     plotBody.set_anchor('NE')
@@ -58,12 +58,12 @@ def ReadSensor():
 tiltSave=[0,0,0,0]    
 class Body:
     def __init__(self):
-        Body.ParamTorus(self,10,2) #bei initialisierung wird im Konstruktor der Körper Parametrisiert
+        Body.ParamTorus(self,10,2) #bei initialisierung wird im Konstruktor der Koerper Parametrisiert
         #BodyPosition.ParamKegel(self,10,10)
     
     def ParamTorus(self,Ra,Ri):
         #Parametrisiesrung Torus
-        p,t= np.mgrid[0:2*np.pi:10j, 0:2*np.pi:10j] #auflösung des Körpers 
+        p,t= np.mgrid[0:2*np.pi:10j, 0:2*np.pi:10j] #aufloesung des Koerpers 
         self.x  = (Ra+Ri*np.cos(p))*np.cos(t)
         self.y  = (Ra+Ri*np.cos(p))*np.sin(t)
         self.z  = Ri*np.sin(p)
@@ -77,9 +77,12 @@ class Body:
         
     def updatePos(self):
         tilt=ReadSensor()
-        phi=float(tilt[0])*np.pi/180
-        teta=float(tilt[1])*np.pi/180
-        psi=float(tilt[2])*np.pi/180
+        try:
+            phi=float(tilt[0])*np.pi/180
+            teta=float(tilt[1])*np.pi/180
+            psi=float(tilt[2])*np.pi/180
+        except (ValueError,IndexError):
+            return (0,0,0)
         drawRectangle(xspeed=calculateSpeed(listval=speedfield[0], val = phi), yspeed=calculateSpeed(listval=speedfield[1], val = teta), zspeed=calculateSpeed(listval=speedfield[2], val = psi))
         speedfield[0],speedfield[1],speedfield[2]=phi,teta,psi
         ##nummeric SinCos Calc 
@@ -132,7 +135,7 @@ class Application(Frame):
         ##erstellung Frames    
         self.mainFrameLeft=Frame(master)
         self.mainFrameRight=Frame(master)
-        self.mainFrameCenter=Frame(master)    
+        self.mainFrameCenter=Frame(master)
         self.mainFrameLeft.pack(side=LEFT,padx=5, pady=5)
         self.mainFrameCenter.pack(side=LEFT,padx=5, pady=5)    
         self.mainFrameRight.pack(side=RIGHT,padx=5, pady=5)    
@@ -247,12 +250,12 @@ class Application(Frame):
 speedfield=[0,0,0]   #stores last phi,teta,psi for use in calculateSpeed()
 
 def drawRectangle(xspeed,yspeed,zspeed):
-    app.leftFrame.sml.delete('all')
-    app.leftFrame.smc.delete('all')
-    app.leftFrame.smr.delete('all')
-    app.leftFrame.sml.create_rectangle(0,100,52,xspeed+100, fill='black')
-    app.leftFrame.smc.create_rectangle(0,100,52,yspeed+100, fill='black')
-    app.leftFrame.smr.create_rectangle(0,100,52,zspeed+100, fill='black')
+    app.sml.delete('all')
+    app.smc.delete('all')
+    app.smr.delete('all')
+    app.sml.create_rectangle(0,100,52,xspeed+100, fill='black')
+    app.smc.create_rectangle(0,100,52,yspeed+100, fill='black')
+    app.smr.create_rectangle(0,100,52,zspeed+100, fill='black')
 
 def calculateSpeed(listval,val):
     aspeed=val - listval
