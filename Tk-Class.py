@@ -80,9 +80,12 @@ class Body:
         
     def updatePos(self):
         tilt=ReadSensor()
-        phi=float(tilt[0])*np.pi/180
-        teta=float(tilt[1])*np.pi/180
-        psi=float(tilt[2])*np.pi/180
+        try:
+            phi=float(tilt[0])*np.pi/180
+            teta=float(tilt[1])*np.pi/180
+            psi=float(tilt[2])*np.pi/180
+        except (ValueError,IndexError):
+            return (0,0,0)
         drawRectangle(xspeed=calculateSpeed(listval=self.speedfield[0], val = phi), yspeed=calculateSpeed(listval=self.speedfield[1], val = teta), zspeed=calculateSpeed(listval=self.speedfield[2], val = psi))
         self.speedfield=[phi,teta,psi]
         ##nummeric SinCos Calc 
