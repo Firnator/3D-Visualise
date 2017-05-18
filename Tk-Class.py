@@ -31,7 +31,7 @@ ser = serial.Serial()
 ser.baudrate = 9600
 ser.port = 'COM5'
 
-def UpdatePlotWidget(i):
+def UpdateWidget(i):
     global plotBody
     x,y,z=Body.updatePos(B1)
     plotBody.clear()#l�scht den alten plot, damit nicht neue figuren auf alte geplotet werden
@@ -272,6 +272,6 @@ app = Application(master=root)
 #erzeugt ein element body
 B1=Body()     
 #change_text()
-ani = animation.FuncAnimation(fig, UpdatePlotWidget, interval=1)
+ani = animation.FuncAnimation(fig, UpdateWidget, interval=1)
 #ani = animation.FuncAnimation(fig, UpdatePlotWidget, interval=1)
 app.mainloop()
