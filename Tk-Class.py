@@ -116,7 +116,11 @@ def _ParamTorus():
 def _ParamKegel():
     Body.ParamKegel(B1,10,10)
 def _comC():
-    ser.open()   
+    try:
+        ser.open()   
+    except serial.SerialException:
+        ser.port = 'COM4'
+        ser.open()
 def _quit():
     root.quit()     # stop mainloop
     root.destroy()  # beugt einem Fatal Python Error vor: PyEval_RestoreThread: NULL tstate
@@ -249,7 +253,7 @@ class Application(Frame):
 
         leftRollLab.pack(side='bottom')
         leftPitchLab.pack(side='bottom')
-        leftYawLab.pack(side='bottom') 
+        leftYawLab.pack(side='bottom')
 
 
 
@@ -265,8 +269,7 @@ def calculateSpeed(listval,val):
     aspeed=val - listval
     return aspeed*100
     
-    
-    
+        
     
 app = Application(master=root)    
 #erzeugt ein element body
