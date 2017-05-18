@@ -55,10 +55,13 @@ def ReadSensor():
         s=[0,0,0,0]
     return s
 
-tiltSave=[0,0,0,0]    
+tiltSave=[0,0,0,0]  
+  
+  
 class Body:
     def __init__(self):
         Body.ParamTorus(self,10,2) #bei initialisierung wird im Konstruktor der Körper Parametrisiert
+        self.speedfield=[0,0,0] #stores last phi,teta,psi for use in calculateSpeed()
         #BodyPosition.ParamKegel(self,10,10)
     
     def ParamTorus(self,Ra,Ri):
@@ -80,8 +83,8 @@ class Body:
         phi=float(tilt[0])*np.pi/180
         teta=float(tilt[1])*np.pi/180
         psi=float(tilt[2])*np.pi/180
-        drawRectangle(xspeed=calculateSpeed(listval=speedfield[0], val = phi), yspeed=calculateSpeed(listval=speedfield[1], val = teta), zspeed=calculateSpeed(listval=speedfield[2], val = psi))
-        speedfield[0],speedfield[1],speedfield[2]=phi,teta,psi
+        drawRectangle(xspeed=calculateSpeed(listval=self.speedfield[0], val = phi), yspeed=calculateSpeed(listval=self.speedfield[1], val = teta), zspeed=calculateSpeed(listval=self.speedfield[2], val = psi))
+        self.speedfield=[phi,teta,psi]
         ##nummeric SinCos Calc 
         sinPhi =np.sin(phi)
         cosPhi =np.cos(phi)
@@ -244,15 +247,15 @@ class Application(Frame):
         leftPitchLab.pack(side='bottom')
         leftYawLab.pack(side='bottom') 
 
-speedfield=[0,0,0]   #stores last phi,teta,psi for use in calculateSpeed()
+
 
 def drawRectangle(xspeed,yspeed,zspeed):
-    app.leftFrame.sml.delete('all')
-    app.leftFrame.smc.delete('all')
-    app.leftFrame.smr.delete('all')
-    app.leftFrame.sml.create_rectangle(0,100,52,xspeed+100, fill='black')
-    app.leftFrame.smc.create_rectangle(0,100,52,yspeed+100, fill='black')
-    app.leftFrame.smr.create_rectangle(0,100,52,zspeed+100, fill='black')
+    app.sml.delete('all')
+    app.smc.delete('all')
+    app.smr.delete('all')
+    app.sml.create_rectangle(0,100,52,xspeed+100, fill='black')
+    app.smc.create_rectangle(0,100,52,yspeed+100, fill='black')
+    app.smr.create_rectangle(0,100,52,zspeed+100, fill='black')
 
 def calculateSpeed(listval,val):
     aspeed=val - listval
