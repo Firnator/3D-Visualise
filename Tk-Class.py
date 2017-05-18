@@ -159,6 +159,7 @@ class Application(Frame):
         canvas.get_tk_widget().pack(side=Tk.TOP,anchor = 'center', fill=Tk.BOTH, expand=3)
         
     def rightFrame(self):
+        global blub
         strBackground='white'
         framePlotSettings=Frame(self.mainFrameRight)
         framePlotSettings.pack(side=TOP,anchor = 'n',padx=30, pady=30)
