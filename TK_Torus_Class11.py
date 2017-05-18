@@ -184,7 +184,7 @@ mainFrameCenter.configure(background=strBackground)
 
 #==========================================================================================
 ##frameLeft
-leftLeftFrame = Frame(master = mainFrameLeft,background=strBackground)
+leftLeftFrame = Frame(mainFrameLeft,background=strBackground)
 centerLeftFrame= Frame(master = mainFrameLeft,background=strBackground)
 rightLeftFrame = Frame(master = mainFrameLeft,background=strBackground)
 leftLeftFrame.pack(side=LEFT,padx=5, pady=5)
@@ -285,7 +285,7 @@ resetButton = Button(master = frameMotorControll, text='Reset',command=baseReset
 #canvasRollShow.create_text(text=repr(x))
 #canvasRollShow.grid(row=3, column=0)
 #--
-resetButton.grid(row=0,column = 1,pady=20)
+resetButton.grid(row=0,column = 1,pady=0)
 rollShow.grid(row=4, column=0)
 pitchShow.grid(row=4, column=1)
 yawShow.grid(row=4, column=2)
