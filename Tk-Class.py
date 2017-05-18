@@ -1,6 +1,6 @@
 '''
 =========================
-Version2.2
+Version3.0
 =========================
 
 by MARVIN GLOTH
@@ -34,7 +34,7 @@ ser.port = 'COM5'
 def UpdatePlotWidget(i):
     global plotBody
     x,y,z=Body.updatePos(B1)
-    plotBody.clear()#löscht den alten plot, damit nicht neue figuren auf alte geplotet werden
+    plotBody.clear()#lï¿½scht den alten plot, damit nicht neue figuren auf alte geplotet werden
     ##Plottet in die Figurenumgebung
     plotBody.plot_surface(x, y, z, rstride=1, cstride=1)#cmap=plt.cm.hot
     plotBody.set_anchor('NE')
@@ -60,13 +60,13 @@ tiltSave=[0,0,0,0]
   
 class Body:
     def __init__(self):
-        Body.ParamTorus(self,10,2) #bei initialisierung wird im Konstruktor der Körper Parametrisiert
+        Body.ParamTorus(self,10,2) #bei initialisierung wird im Konstruktor der Kï¿½rper Parametrisiert
         self.speedfield=[0,0,0] #stores last phi,teta,psi for use in calculateSpeed()
         #BodyPosition.ParamKegel(self,10,10)
     
     def ParamTorus(self,Ra,Ri):
         #Parametrisiesrung Torus
-        p,t= np.mgrid[0:2*np.pi:10j, 0:2*np.pi:10j] #auflösung des Körpers 
+        p,t= np.mgrid[0:2*np.pi:10j, 0:2*np.pi:10j] #auflï¿½sung des Kï¿½rpers 
         self.x  = (Ra+Ri*np.cos(p))*np.cos(t)
         self.y  = (Ra+Ri*np.cos(p))*np.sin(t)
         self.z  = Ri*np.sin(p)
@@ -275,6 +275,3 @@ B1=Body()
 ani = animation.FuncAnimation(fig, UpdatePlotWidget, interval=1)
 #ani = animation.FuncAnimation(fig, UpdatePlotWidget, interval=1)
 app.mainloop()
-
-
-
