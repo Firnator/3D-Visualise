@@ -80,6 +80,8 @@ class Body:
         phi=float(tilt[0])*np.pi/180
         teta=float(tilt[1])*np.pi/180
         psi=float(tilt[2])*np.pi/180
+        drawRectangle(xspeed=calculateSpeed(listval=speedfield[0], val = phi), yspeed=calculateSpeed(listval=speedfield[1], val = teta), zspeed=calculateSpeed(listval=speedfield[2], val = psi))
+        speedfield[0],speedfield[1],speedfield[2]=phi,teta,psi
         ##nummeric SinCos Calc 
         sinPhi =np.sin(phi)
         cosPhi =np.cos(phi)
@@ -218,11 +220,47 @@ class Application(Frame):
         buttonTetaM.grid(row=2, column=1,padx=2)
         buttonPsiP.grid(row=0, column=2,padx=2)
         buttonPsiM.grid(row=2, column=2,padx=2)
-
+#?????app.leftFrame.sml
     def leftFrame(self):
-        button1 = Button(self.mainFrameLeft, text='Quit', command=_quit)
-        button1.pack(side=BOTTOM,anchor = 'center')    
+        strBackground='white'
+        leftLeftFrame = Frame(self.mainFrameLeft,background=strBackground)
+        centerLeftFrame= Frame(self.mainFrameLeft,background=strBackground)
+        rightLeftFrame = Frame(self.mainFrameLeft,background=strBackground)
+        leftLeftFrame.pack(side=LEFT,padx=5, pady=5)
+        centerLeftFrame.pack(side=LEFT,padx=5, pady=5)    
+        rightLeftFrame.pack(side=RIGHT,padx=5, pady=5) 
         
+        self.sml = Canvas(leftLeftFrame, width=50, height=200)
+        self.smc = Canvas(centerLeftFrame, width=50, height=200) # Canvas for Speedometer
+        self.smr = Canvas(rightLeftFrame, width=50, height=200)
+        self.sml.pack(side='top')
+        self.smc.pack(side='top')
+        self.smr.pack(side='top')
+        leftRollLab = Label(leftLeftFrame, text="\u03A6",background=strBackground)
+        leftPitchLab = Label(centerLeftFrame, text="\u0398",background=strBackground)
+        leftYawLab = Label(rightLeftFrame, text="\u03A8",background=strBackground)
+
+        leftRollLab.pack(side='bottom')
+        leftPitchLab.pack(side='bottom')
+        leftYawLab.pack(side='bottom') 
+
+speedfield=[0,0,0]   #stores last phi,teta,psi for use in calculateSpeed()
+
+def drawRectangle(xspeed,yspeed,zspeed):
+    app.leftFrame.sml.delete('all')
+    app.leftFrame.smc.delete('all')
+    app.leftFrame.smr.delete('all')
+    app.leftFrame.sml.create_rectangle(0,100,52,xspeed+100, fill='black')
+    app.leftFrame.smc.create_rectangle(0,100,52,yspeed+100, fill='black')
+    app.leftFrame.smr.create_rectangle(0,100,52,zspeed+100, fill='black')
+
+def calculateSpeed(listval,val):
+    aspeed=val - listval
+    return aspeed*100
+    
+    
+    
+    
 app = Application(master=root)    
 #erzeugt ein element body
 B1=Body()     
